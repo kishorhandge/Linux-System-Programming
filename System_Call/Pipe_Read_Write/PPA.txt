@@ -1,0 +1,102 @@
+#include<stdio.h>
+#include<pthread.h>
+#include<fcntl.h>
+#include<unistd.h>
+
+
+void * Demo(void *p)
+{
+    int fd = 0;
+    int iRet = 0 , iCount = 0,i = 0;
+    char Buffer[1024] = {'\0'};
+
+    fd = open("PPA.txt",O_RDONLY);
+
+    while((iRet = read(fd,Buffer,sizeof(Buffer)))!= 0)
+    {
+        for( i = 0;i<iRet;i++)
+        {
+            if((Buffer[i] >= 'A') && (Buffer[i] <='Z' ))
+            {
+                iCount++;
+            }
+        }
+    }
+
+    close(fd);
+
+    printf("Number of capital character %d\n",iCount);
+
+    return NULL;
+}
+ 
+void * Hello(void *p)
+{
+    
+    int fd = 0;
+    int iRet = 0 , iCount = 0,i = 0;
+    char Buffer[1024] = {'\0'};
+
+    fd = open("LB.txt",O_RDONLY);
+
+    while((iRet = read(fd,Buffer,sizeof(Buffer)))!= 0)
+    {
+        for( i = 0;i<iRet;i++)
+        {
+            if((Buffer[i] >= 'a') && (Buffer[i] <='z' ))
+            {
+                iCount++;
+            }
+        }
+    }
+
+    close(fd);
+
+    printf("Number of small character %d\n",iCount);
+    
+    return NULL;
+}
+
+int main()
+{
+    pthread_t TID1,TID2;
+    int iRet = 0;
+
+    printf("main thread started:\n");
+
+    iRet = pthread_create(
+                            &TID1,       //Thread id
+                            NULL,       //Thread Attributes
+                            Demo,       //Thread call back function
+                            NULL        //Parameters for the call back  function
+
+                        );
+
+    if(iRet == 0)
+    {
+        printf("Thread gets created succesfully with TID1 :%lu\n",(unsigned long)TID1);
+    }
+
+    iRet = pthread_create(
+                            &TID2,       //Thread id
+                            NULL,       //Thread Attributes
+                            Hello,       //Thread call back function
+                            NULL        //Parameters for the call back  function
+
+                        );
+
+    if(iRet == 0)
+    {
+        printf("Thread gets created succesfully with TID2 :%lu\n",(unsigned long)TID2);
+    }
+
+    //wait
+
+    pthread_join(TID1,NULL);
+
+    pthread_join(TID2,NULL);
+    
+    printf("End Of main thread:\n");
+
+    return 0;
+}
