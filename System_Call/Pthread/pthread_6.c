@@ -1,0 +1,50 @@
+/****************************************************************************************
+* Program Name : Passing Parameter to Thread using pthread
+* Description  : This program demonstrates how to pass a value to a thread.
+*                The value is received inside the thread function using void pointer.
+*                The child thread prints the received value.
+*                pthread_join() is used to synchronize main and child thread.
+****************************************************************************************/
+
+#include <stdio.h>      // For printf()
+#include <pthread.h>    // For pthread functions
+
+// Thread callback function
+void * Demo(void *p)
+{
+    // Print the value received from main thread
+    printf("Inside thread with Value : %d\n", (int)p);
+
+    return NULL;        // Terminate thread
+}
+
+int main()
+{
+    pthread_t TID;      // Variable to store thread ID
+    int iRet = 0;       // Variable to store return value
+    int No = 11;        // Value to be passed to thread
+
+    printf("Main thread started\n");
+
+    // Create thread and pass value as parameter
+    iRet = pthread_create(
+                            &TID,           // Thread ID
+                            NULL,           // Default thread attributes
+                            Demo,           // Thread callback function
+                            (int *)No       // Parameter for the callback function
+                         );
+
+    // Check if thread creation is successful
+    if(iRet == 0)
+    {
+        printf("Thread gets created successfully with TID : %lu\n",
+               (unsigned long)TID);
+    }
+
+    // Wait for child thread to complete
+    pthread_join(TID, NULL);
+
+    printf("End of main thread\n");
+
+    return 0;           // Return success
+}
